@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussion App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            width: 80%;
+            height: 80vh;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .left-pane {
+            width: 40%;
+            border-right: 1px solid #ccc;
+            padding: 20px;
+            background-color: #fafafa;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .right-pane {
+            width: 60%;
+            padding: 30px;
+            background-color: #ffffff;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        #title,
+        #question {
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        #title:focus,
+        #question:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #resolveBtn {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #resolveBtn:hover {
+            background-color: #0056b3;
+        }
+
+        .resolved-message {
+            color: #28a745;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            margin: 40px auto;
+            background-color: #f0fff4;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+        }
+
+        .question-box {
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .question-box:hover {
+            background-color: #e9f7ff;
+        }
+
+        /* Scrollbar styling */
+        .left-pane::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .left-pane::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
+
+        .left-pane::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 5px;
+        }
+
+        .left-pane::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+        }
+
+        /* Additional styling for better readability */
+        h3 {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left-pane" id="questionList">
+            <h1>Discussion Prompt</h1>
+            <!-- Questions will be displayed here -->
+        </div>
+        <div class="right-pane" id="formPane">
+            <h2>Ask a Question</h2>
+            <form id="questionForm">
+                <label for="title">Title (required):</label>
+                <input type="text" id="title" placeholder="Enter the title of your question" required>
+
+                <label for="question">Question (required):</label>
+                <textarea id="question" placeholder="Enter your question here..." required></textarea>
+
+                <button type="submit">Submit Question</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const questionForm = document.getElementById('questionForm');
+        const questionList = document.getElementById('questionList');
+    
+        questionForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+    
+            const title = document.getElementById('title').value;
+            const questionText = document.getElementById('question').value;
+    
+            if (title && questionText) {
+                const newQuestion = document.createElement('div');
+                newQuestion.classList.add('question-box');
+                newQuestion.innerHTML = `<strong>${title}</strong><p>${questionText}</p>`;
+                newQuestion.addEventListener('click', function () {
+                    displayQuestion(title, questionText);
+                });
+                questionList.appendChild(newQuestion);
+    
+                questionForm.reset();
+            }
+        });
+    
+        function displayQuestion(title, questionText) {
+            const formPane = document.getElementById('formPane');
+            formPane.innerHTML = `
+                <h2>${title}</h2>
+                <p>${questionText}</p>
+                
+                <h3>Responses</h3>
+                <div id="responseList"></div>
+                
+                <form id="responseForm">
+                    <label for="name">Name (required):</label>
+                    <input type="text" id="name" required><br><br>
+    
+                    <label for="comment">Comment (required):</label>
+                    <textarea id="comment" required></textarea><br><br>
+    
+                    <button type="submit">Submit Response</button>
+                </form><br>
+                <button id="resolveBtn">Resolve</button>
+                <h3>Previous Answers</h3>
+                <div id="previousAnswers"></div>
+            `;
+            attachResponseHandler();
+        }
+    
+        function attachResponseHandler() {
+            const responseForm = document.getElementById('responseForm');
+            responseForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+    
+                const name = document.getElementById('name').value;
+                const comment = document.getElementById('comment').value;
+    
+                if (name && comment) {
+                    const responseList = document.getElementById('responseList');
+                    const newResponse = document.createElement('div');
+                    newResponse.innerHTML = `<strong>${name}:</strong> <p>${comment}</p>`;
+                    responseList.appendChild(newResponse);
+    
+                    const previousAnswers = document.getElementById('previousAnswers');
+                    const newAnswer = document.createElement('div');
+                    newAnswer.innerHTML = `<strong>${name}:</strong> <p>${comment}</p>`;
+                    previousAnswers.appendChild(newAnswer);
+    
+                    responseForm.reset();
+                }
+            });
+    
+            const resolveBtn = document.getElementById('resolveBtn');
+            resolveBtn.addEventListener('click', function () {
+                const formPane = document.getElementById('formPane');
+                formPane.innerHTML = `<div class="resolved-message">This question has been resolved.</div>`;
+            });
+        }
+    </script>
+</body>
+
+</html>
